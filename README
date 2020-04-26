@@ -1,0 +1,11 @@
+SENSOR CALIBRATION
+
+The magnetometer and accelerometer calibration approaches are described in this excellent blog article:
+
+    http://sailboatinstruments.blogspot.com/2011/08/improved-magnetometer-calibration.html 
+
+The author describes magneto, a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). For convenience, I’ve collected all of the basic parts of magneto, described in the sailboatinstruments link, into one file that can be compiled and run on a desktop.
+
+This approach fits an ellipsoid to the data, avoiding statistical problems associated with the min/max approach, rotates the ellipsoid to align with the coordinate axes, scales the axial dimensions to a sphere, and rotates back. The result is a set of offsets and a nine element matrix correction that must be applied to the raw data.
+
+The magneto program was modified to add measurement rejection criteria and to publish data initialization statements that can be incorporated into your code.
