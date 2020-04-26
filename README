@@ -26,3 +26,6 @@ The result is a set of offsets and a nine element matrix correction that must be
 
 The magneto program was modified to add measurement rejection criteria and to publish data initialization statements 
 that can be incorporated directly into the AHRS code.
+
+For compilation of MPU9250_Mahony.ino or MPU9250_tiltcomp.ino, copy the contents of the "lib" directory into a "lib"
+subfolder of the Arduino folders containing the respective .ino files.
