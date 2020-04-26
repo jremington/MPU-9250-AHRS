@@ -1,11 +1,23 @@
-SENSOR CALIBRATION
+MPU-9250-AHRS
 
+This repository was created to address significant shortcomings in other AHRS repositories for the MPU-9250 9DOF sensor.  
+
+The currently implemented AHRS algorithm is the standard Madgwick/Mahoney scheme (two alternative solvers) found in 
+other repositories. However, new features have been added, such as code to simplify accurate calibration of the accelerometer, 
+magnetometer and gyro. Care was taken to correctly align the magnetometer and accelerometer axes, so that the output orientation
+is meaningful, and to simplify overall operation. 
+
+SENSOR CALIBRATION
 The magnetometer and accelerometer calibration approaches are described in this excellent blog article:
 
     http://sailboatinstruments.blogspot.com/2011/08/improved-magnetometer-calibration.html 
 
-The author describes magneto, a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). For convenience, I’ve collected all of the basic parts of magneto, described in the sailboatinstruments link, into one file that can be compiled and run on a desktop.
+The author describes magneto, a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). 
+For convenience, I’ve collected all of the basic parts of magneto, described in the sailboatinstruments link, into one file 
+that can be compiled and run on a desktop.
+The magneto approach fits an ellipsoid to the data, avoiding statistical problems associated with the min/max approach, 
+rotates the ellipsoid to align with the coordinate axes, scales the axial dimensions to a sphere, and rotates back. 
+The result is a set of offsets and a nine element matrix correction that must be applied to the raw data.
 
-This approach fits an ellipsoid to the data, avoiding statistical problems associated with the min/max approach, rotates the ellipsoid to align with the coordinate axes, scales the axial dimensions to a sphere, and rotates back. The result is a set of offsets and a nine element matrix correction that must be applied to the raw data.
-
-The magneto program was modified to add measurement rejection criteria and to publish data initialization statements that can be incorporated into your code.
+The magneto program was modified to add measurement rejection criteria and to publish data initialization statements 
+that can be incorporated directly into the AHRS code.
