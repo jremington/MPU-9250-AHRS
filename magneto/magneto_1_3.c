@@ -1,7 +1,7 @@
 // magneto magnetometer calibration code
 // from http://sailboatinstruments.blogspot.com/2011/08/improved-magnetometer-calibration.html
-// tested and works with Code::Blocks 10.05 and 16.01
-// Command line version slightly modified from original, sjames_remington@gmail.com
+// tested and works with Code::Blocks 10.05, 16.01 and 20.03
+// Command line version slightly modified from original, SJR 4/2020
 
 #include <stdio.h>
 #include <math.h>
