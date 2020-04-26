@@ -1,0 +1,20 @@
+Basic setup: 8MHz/3.3V Arduino Pro Mini with direct I2C connection to MPU-9250 module (e.g. Sparkfun)
+
+1. Run MPU9250_cal and follow instructions. 
+   First, the gyro offsets are collected and averaged. Keep sensor still!
+   Second, 300 raw data points are collected for accelerometer x,y,z and magnetometer x,y,z
+   When done, copy the screen from the serial monitor, and use a spreadsheet to create six columns of data.
+   Save as .csv file (Comma Separated Value (either space, tab or comma separation is OK).
+   
+2. Split apart the above .csv file to make two separate files for the magnetometer and accelerometer, each with three columns.
+
+3. Run Magneto v1.3 twice, once for each sensor.  
+   For the accelerometer, Hnorm=10000. is a suitable choice. 
+   For the magnetometer, Hnorm = 100. is a suitable choice. Remeber these choices of Hnorm!
+   If necessary, reject measurements that deviate by more than 2*sigma from the mean (rejection n = 2.0)
+   
+4. Copy the output of Magneto into either MPU9520_tiltcomp or MPU9250_AHRS. At the moment the program is set up to use
+   only the offset (B) and the diagonal elements of the matrix Ainv, which must be divided by the Hnorm values. This is to scale the 
+   measurement vectors lengths to 1.0 on average. See the example code for typical values
+   
+5. For the AHRS, copy the gyro offsets from the original run of MPU9250_cal into the G_off[] initialization statements.
