@@ -16,9 +16,10 @@ I also strongly recommend this blog post as a general guide to magnetometer/acce
 
    https://thecavepearlproject.org/2015/05/22/calibrating-any-compass-or-accelerometer-for-arduino/
 
-The author describes magneto, a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). 
+Magneto is a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). 
 For convenience, I’ve collected all of the basic parts of magneto, described in the sailboatinstruments link, into one file 
 that can be compiled and run on a desktop.
+
 The magneto approach fits an ellipsoid to the data, avoiding statistical problems associated with the min/max approach, 
 rotates the ellipsoid to align with the coordinate axes, scales the axial dimensions to a sphere, and rotates back. 
 The result is a set of offsets and a nine element matrix correction that must be applied to the raw data.
