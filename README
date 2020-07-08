@@ -2,10 +2,8 @@
 
 This repository was created to address significant shortcomings in other AHRS repositories for the MPU-9250 9DOF sensor.  
 
-The currently implemented AHRS algorithm is the standard Madgwick/Mahony scheme (two alternative solvers) found in 
-other repositories. However, new features have been added, such as code to simplify accurate calibration of the accelerometer, 
-magnetometer and gyro. Care was taken to correctly align the magnetometer and accelerometer axes, so that the output orientation
-is meaningful, and to simplify overall operation. 
+The currently implemented AHRS algorithm is the standard Madgwick/Mahony scheme (two alternative solvers) found in other repositories. However, new features have been added, such as code to simplify accurate calibration of the accelerometer, 
+magnetometer and gyro. Care was taken to correctly align the magnetometer and accelerometer axes, so that the output orientation is meaningful, and to simplify overall operation. 
 
 SENSOR CALIBRATION
 The magnetometer and accelerometer calibration approaches are described in this excellent blog article:
@@ -16,16 +14,16 @@ I also strongly recommend this blog post as a general guide to magnetometer/acce
 
    https://thecavepearlproject.org/2015/05/22/calibrating-any-compass-or-accelerometer-for-arduino/
 
-Magneto is a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). 
-For convenience, I’ve collected all of the basic parts of magneto, described in the sailboatinstruments link, into one file 
+Magneto is a fair sized C program that runs on a PC or a Mac (suggest to use Code::Blocks IDE on Windows). For convenience, I’ve collected all of the basic parts of magneto, described in the sailboatinstruments link, into one file 
 that can be compiled and run on a desktop.
 
-The magneto approach fits an ellipsoid to the data, avoiding statistical problems associated with the min/max approach, 
-rotates the ellipsoid to align with the coordinate axes, scales the axial dimensions to a sphere, and rotates back. 
+The magneto approach fits an ellipsoid to the data, avoiding statistical problems associated with the min/max approach, rotates the ellipsoid to align with the coordinate axes, scales the axial dimensions to a sphere, and rotates back. 
 The result is a set of offsets and a nine element matrix correction that must be applied to the raw data.
 
-The magneto program was modified to add measurement rejection criteria and to publish data initialization statements 
-that can be incorporated directly into the AHRS code.
+The magneto program was modified to add measurement rejection criteria and to publish data initialization statements that can be incorporated directly into the AHRS code. 
 
-For compilation of MPU9250_Mahony.ino or MPU9250_tiltcomp.ino, copy the contents of the "lib" directory into a "lib"
-subfolder of the Arduino folders containing the respective .ino files.
+A detailed example of using the above procedures in a particularly difficult case, with severe "hard iron" distortion can be found at 
+
+https://forum.pololu.com/t/correcting-the-balboa-magnetometer/14315
+
+For compilation of MPU9250_Mahony.ino or MPU9250_tiltcomp.ino, copy the contents of the "lib" directory into a "lib" subfolder of the Arduino folders containing the respective .ino files.
