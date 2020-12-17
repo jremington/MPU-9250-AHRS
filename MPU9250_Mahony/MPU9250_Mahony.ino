@@ -1,6 +1,9 @@
 //
 // MPU-9250 Mahony AHRS  S.J. Remington 3/2020
-// last update 7/15/2020
+// last update 12/17/2020
+// added full matrix calibration for accel and mag
+
+// ***Standard orientation defined by gyro/accel: X North Y West Z Up***
 
 // VERY VERY IMPORTANT!
 // Both the accelerometer and magnetometer MUST be properly calibrated for this program to work, and the gyro offset must be determned.
@@ -34,9 +37,23 @@ I2Cdev   I2C_M;
 //These are the previously determined offsets and scale factors for accelerometer and magnetometer, using MPU9250_cal and Magneto 1.2
 //The AHRS will NOT work well or at all if these are not correct
 //
-float A_cal[6] = {439.9, 302.59, 772.3,1.00851, 1.00096, 0.99988}; // 0..2 offset xyz, 3..5 scale xyz
-float M_cal[6] = {17.6, 27.8, -38.4, 1.16234, 1.17053,1.13865}; // can make both 3x3 to handle off-diagonal corrections
-float G_off[3] = { -398.5, 128.2, 246.8}; //raw offsets, determined for gyro at rest
+// redetermined 12/16/2020
+//acel offsets and correction matrix
+ float A_B[3] {  539.75,  218.36,  834.53}; 
+ float A_Ainv[3][3]
+  {{  0.51280,  0.00230,  0.00202},
+  {  0.00230,  0.51348, -0.00126},
+  {  0.00202, -0.00126,  0.50368}};
+  
+// mag offsets and correction matrix
+  float M_B[3]
+ {   18.15,   28.05,  -36.09};
+ float M_Ainv[3][3]
+ {{  0.68093,  0.00084,  0.00923},
+  {  0.00084,  0.69281,  0.00103},
+  {  0.00923,  0.00103,  0.64073}};
+  
+  float G_off[3] = {-299.7, 113.2, 202.4}; //raw offsets, determined for gyro at rest
 // ^^^^^^^^^^^^^^^^^^^ VERY VERY IMPORTANT ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 char s[60]; //snprintf buffer
@@ -85,29 +102,17 @@ void setup() {
 
 void loop()
 {
-  static int i = 0;
-
   get_MPU_scaled();
   now = micros();
   deltat = (now - last) * 1.0e-6; //seconds since last update
   last = now;
 
-
-
   // correct for differing accelerometer and magnetometer alignment by circularly permuting mag axes
 
   MahonyQuaternionUpdate(Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2],
                          Mxyz[1], Mxyz[0], -Mxyz[2], deltat);
-  // Define Tait-Bryan angles.
-  // In this coordinate system, the positive z-axis is down toward Earth.
-  // Yaw is the angle between Sensor x-axis and Earth magnetic North
-  // (or true North if corrected for local declination, looking down on the sensor
-  // positive yaw is counterclockwise, which is not conventional for NED navigation.
-  // Pitch is angle between sensor x-axis and Earth ground plane, toward the
-  // Earth is positive, up toward the sky is negative. Roll is angle between
-  // sensor y-axis and Earth ground plane, y-axis up is positive roll. These
-  // arise from the definition of the homogeneous rotation matrix constructed
-  // from quaternions. Tait-Bryan angles as well as Euler angles are
+  //  Standard orientation: X North, Y West, Z Up
+  //  Tait-Bryan angles as well as Euler angles are
   // non-commutative; that is, the get the correct orientation the rotations
   // must be applied in the correct order which for this configuration is yaw,
   // pitch, and then roll.
@@ -124,8 +129,9 @@ void loop()
   // http://www.ngdc.noaa.gov/geomag-web/#declination
   //conventional nav, yaw increases CW from North, corrected for local magnetic declination
 
-  yaw = -yaw + 14.9;
+  yaw = -yaw + 14.5;
   if(yaw<0) yaw += 360.0;
+  if(yaw>360.0) yaw -= 360.0;
   now_ms = millis(); //time to print?
   if (now_ms - last_ms >= print_ms) {
     last_ms = now_ms;
@@ -139,25 +145,33 @@ void loop()
   }
 }
 void get_MPU_scaled(void) {
+  float temp[3];
+  int i;
   accelgyro.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
-  Axyz[0] = (float) ax;
-  Axyz[1] = (float) ay;
-  Axyz[2] = (float) az;
-  //apply offsets and scale factors from Magneto
-  for (int i = 0; i < 3; i++) Axyz[i] = (Axyz[i] - A_cal[i]) * A_cal[i + 3];
-  vector_normalize(Axyz);
 
   Gxyz[0] = ((float) gx - G_off[0]) * gscale; //250 LSB(d/s) default to radians/s
   Gxyz[1] = ((float) gy - G_off[1]) * gscale;
   Gxyz[2] = ((float) gz - G_off[2]) * gscale;
 
+  Axyz[0] = (float) ax;
+  Axyz[1] = (float) ay;
+  Axyz[2] = (float) az;
+  //apply offsets (bias) and scale factors from Magneto
+  for (i = 0; i < 3; i++) temp[i] = (Axyz[i] - A_B[i]);
+  Axyz[0] = A_Ainv[0][0] * temp[0] + A_Ainv[0][1] * temp[1] + A_Ainv[0][2] * temp[2];
+  Axyz[1] = A_Ainv[1][0] * temp[0] + A_Ainv[1][1] * temp[1] + A_Ainv[1][2] * temp[2];
+  Axyz[2] = A_Ainv[2][0] * temp[0] + A_Ainv[2][1] * temp[1] + A_Ainv[2][2] * temp[2];
+  vector_normalize(Axyz);
+
   Mxyz[0] = (float) mx;
   Mxyz[1] = (float) my;
   Mxyz[2] = (float) mz;
   //apply offsets and scale factors from Magneto
-  for (int i = 0; i < 3; i++) Mxyz[i] = (Mxyz[i] - M_cal[i]) * M_cal[i + 3];
+  for (i = 0; i < 3; i++) temp[i] = (Mxyz[i] - M_B[i]);
+  Mxyz[0] = M_Ainv[0][0] * temp[0] + M_Ainv[0][1] * temp[1] + M_Ainv[0][2] * temp[2];
+  Mxyz[1] = M_Ainv[1][0] * temp[0] + M_Ainv[1][1] * temp[1] + M_Ainv[1][2] * temp[2];
+  Mxyz[2] = M_Ainv[2][0] * temp[0] + M_Ainv[2][1] * temp[1] + M_Ainv[2][2] * temp[2];
   vector_normalize(Mxyz);
-
  }
 
 // Mahony scheme uses proportional and integral filtering on
