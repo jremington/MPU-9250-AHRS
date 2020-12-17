@@ -1,6 +1,8 @@
 #MPU-9250-AHRS
 
-This repository was created to address significant shortcomings in other AHRS repositories for the MPU-9250 9DOF sensor.  
+This repository was created to address significant shortcomings in other AHRS repositories for the MPU-9250 9DOF sensor.
+
+Clarification 12/17/2020: The standard sensor orientation for Tait-Bryan angles is Z Up, X North and Y West
 
 The currently implemented AHRS algorithm is the standard Madgwick/Mahony scheme (two alternative solvers) found in other repositories. However, new features have been added, such as code to simplify accurate calibration of the accelerometer, 
 magnetometer and gyro. The magnetometer and accelerometer axes are realigned so that the output orientation is meaningful, and to simplify overall operation. 
