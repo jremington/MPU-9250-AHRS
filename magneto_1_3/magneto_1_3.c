@@ -3,8 +3,6 @@
 // tested and works with Code::Blocks 10.05 and 16.01
 // Command line version slightly modified from original, sjames_remington@gmail.com
 
-//*** input data file expected to be blank/tab separated values ***
-
 #include <stdio.h>
 #include <math.h>
 #include <malloc.h>
@@ -59,26 +57,27 @@ int main()
  char filename[64];
   FILE *fp, *fp2;
 
- printf("\r\nMagneto 1.3 4/24/2020\r\nInput .csv file? ");
+ printf("\r\nMagneto 1.3 12/25/2020\r\nInput .csv file? ");
  scanf("%s",&filename);
 
  fp = fopen(filename, "r");
  if (fp == NULL) {printf("file not found"); return 0;}
-
+// get the number of lines in the file
  while(fgets(buf, 100, fp) != NULL)
    nlines++;
  rewind(fp);
 
- xs=0;
- xave=0;
  //
  // calculate mean (norm) and standard deviation for possible outlier rejection
  //
+
+ xs=0;
+ xave=0;
 for( i = 0; i < nlines; i++)
  {
    fgets(buf, 100, fp);
-  index=sscanf(buf, "%lf %lf %lf", &x, &y, &z);
-//   printf("%f %f %f\n",x,y,z);
+   index=sscanf(buf, "%lf,%lf,%lf", &x, &y, &z);
+   printf("%3d %6.0f %6.0f %6.0f\n",i,x,y,z);
    x2 = x*x + y*y + z*z;
    xs += x2;
    xave += sqrt(x2);
@@ -93,9 +92,10 @@ for( i = 0; i < nlines; i++)
  printf("\r\nReject outliers? (0 or n, reject if > n * sigma) ");
  scanf("%lf",&nxsrej);
  printf(" rejection level selected: %lf\r\n ",nxsrej);
+
  // scan file again
 
- nlines2 = 0;
+ nlines2 = 0;  //count non-rejected
  if (nxsrej > 0) {
  printf("\r\nRejecting measurements if abs(vector_length-average)/(std. dev.) > %5.1lf",nxsrej);
 
@@ -103,13 +103,13 @@ for( i = 0; i < nlines; i++)
 for( i = 0; i < nlines; i++)
  {
    fgets(buf, 100, fp);
-  index=sscanf(buf, "%lf %lf %lf", &x, &y, &z);
+   index=sscanf(buf, "%lf,%lf,%lf", &x, &y, &z);
 //   printf("%f %f %f\n",x,y,z);
    x2 = sqrt(x*x + y*y + z*z);  //vector length
    x2 =fabs(x2 - xave)/xs; //standard deviations from mean
    if (x2 < nxsrej) nlines2++;
  }
-  printf("\r\n%d measurements will be rejected",nlines-nlines2);
+  printf("\r\n%3d measurements will be rejected",nlines-nlines2);
   rewind(fp);
  }
 
@@ -125,8 +125,8 @@ for( i = 0; i < nlines; i++)
  for( i = 0; i < nlines; i++)
  {
   fgets(buf, 100, fp);
-  index=sscanf(buf, "%lf %lf %lf", &x, &y, &z);
-   printf("%f %f %f\n",x,y,z);
+  index=sscanf(buf, "%lf,%lf,%lf", &x, &y, &z);  //comma separated values
+//   printf("%6.1f %6.1f %6.1f\n",x,y,z);
    x2 = sqrt(x*x + y*y + z*z);  //vector length
    x2 = fabs(x2 - xave)/xs; //standard deviations from mean
    if ((nxsrej == 0) || (x2 < nxsrej)) {
@@ -148,7 +148,7 @@ for( i = 0; i < nlines; i++)
    }
  }
  fclose(fp);
- printf("\r\n%d measurements processed",j);
+ printf("\r\n%3d measurements processed, expected %d",j,nlines2);
  nlines = nlines2; //reset number of measurements
 
  printf("\r\nExpected norm of local field vector Hm? (0 for default above) ");
@@ -365,14 +365,14 @@ for( i = 0; i < nlines; i++)
 
  // dump corrected measurements if desired
 
- printf(" output filename for corrected values ");
+ printf(" output filename for corrected values (csv) ");
  scanf("%s",&filename);
  if(strlen(filename) > 1) {
 
  fp2 = fopen(filename, "w");
  float xc,yc,zc;
  xs=0;
- for(i = 0; i<nlines; i++){
+ for(i = 0; i<nlines2; i++){
     x = raw[3*i]  -B[0];
     y = raw[3*i+1]-B[1];
     z = raw[3*i+2]-B[2];
@@ -2377,4 +2377,3 @@ void Interchange_Rows(double *A, int row1, int row2, int ncols)
       *pA2++ = temp;
    }
 }
-
