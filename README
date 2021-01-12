@@ -1,6 +1,6 @@
 #MPU-9250-AHRS
 
-This repository was created to address significant shortcomings in other AHRS repositories for the MPU-9250 9DOF sensor.
+This Arduino repository was created to address significant shortcomings in other AHRS repositories for the MPU-9250 9DOF sensor.
 
 Clarification 12/17/2020: The standard sensor orientation for Tait-Bryan angles is X North Y West and Z Up (NWU system)
 
