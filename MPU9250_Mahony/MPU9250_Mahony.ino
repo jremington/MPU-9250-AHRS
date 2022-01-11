@@ -2,7 +2,7 @@
 // MPU-9250 Mahony AHRS  S.J. Remington 3/2020
 // last update 12/17/2020
 // added full matrix calibration for accel and mag
-
+// See: http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms/
 // ***Standard orientation defined by gyro/accel: X North Y West Z Up***
 
 // VERY VERY IMPORTANT!
