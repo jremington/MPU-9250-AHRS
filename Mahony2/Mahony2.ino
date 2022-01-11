@@ -1,5 +1,6 @@
 // New horizon reference 12/2020 improves convergence
 // MPU-9250 Mahony AHRS  S.J. Remington 3/2020
+// heavily modified from http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms/
 // Standard orientation defined by gyro/accel: ***X North Y West Z Up***
 
 // Both the accelerometer and magnetometer MUST be properly calibrated for this program to work, and the gyro offset must be determned.
