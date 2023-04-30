@@ -54,7 +54,7 @@ int main()
   FILE *fp;
 
  printf("\r\nMagneto 1.2\r\n.csv input file name? ");
- scanf("%s",&filename);
+ scanf("%s",filename);
 
  fp = fopen(filename, "r");
  if (fp == NULL) {printf("file not found"); return 0;}
