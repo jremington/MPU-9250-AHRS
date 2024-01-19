@@ -204,7 +204,7 @@ void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, fl
   float hx, hy, hz;  //observed West vector W = AxM
   float ux, uy, uz, wx, wy, wz; //calculated A (Up) and W in body frame
   float ex, ey, ez;
-  float pa, pb, pc;
+  float qa, qb, qc;
 
   // Auxiliary variables to avoid repeated arithmetic
   float q1q1 = q1 * q1;
