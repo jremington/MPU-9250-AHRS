@@ -190,7 +190,6 @@ void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, fl
   float hx, hy, bx, bz;
   float vx, vy, vz, wx, wy, wz;
   float ex, ey, ez;
-  float pa, pb, pc;
 
   // Auxiliary variables to avoid repeated arithmetic
   float q1q1 = q1 * q1;
